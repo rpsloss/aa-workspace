@@ -1,0 +1,5 @@
+node_modules
+dist
+data/package.json
+data/evidence
+.DS_Store
