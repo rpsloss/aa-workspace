@@ -1,5 +1,33 @@
 node_modules
 dist
-data/package.json
-data/evidence
 .DS_Store
+*.log
+
+# CUI-adjacent local package store — never commit
+data/package.json
+data/package.json.bak
+data/*.bak
+data/*.tmp
+data/evidence
+data/evidence/
+data/.package-key
+data/audit.log
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# Encryption key — local to this machine, never commit
+data/.package-key
+.package-key
+
+# Package-access audit (counts only; still local)
+data/audit.log
+
+# Ingested originals — never commit
+data/artifacts/

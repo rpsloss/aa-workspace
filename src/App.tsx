@@ -7,16 +7,24 @@ import Ssp from "./pages/Ssp";
 import Policies from "./pages/Policies";
 import Evidence from "./pages/Evidence";
 import Poam from "./pages/Poam";
+import Assets from "./pages/Assets";
+import StigMatrix from "./pages/Stig";
+import BoundaryPage from "./pages/Boundary";
 import ExportPage from "./pages/Export";
+import Ingest from "./pages/Ingest";
 
 const links = [
   ["/dashboard", "ATO blockers"],
   ["/intake", "Intake"],
   ["/tailoring", "800-53 tailoring"],
   ["/ssp", "SSP"],
+  ["/boundary", "Boundary"],
   ["/policies", "Policy stubs"],
   ["/evidence", "Evidence"],
   ["/poam", "POA&M"],
+  ["/assets", "Hardware / software"],
+  ["/stig", "STIG matrix"],
+  ["/ingest", "eMASS ingest"],
   ["/export", "eMASS working papers"],
 ] as const;
 
@@ -53,7 +61,7 @@ export default function App() {
             {pkg.intake.availability[0]}
           </div>
           <div style={{ marginTop: 8 }}>
-            {saving ? "Saving…" : lastSaved ? `Saved ${lastSaved}` : "Local JSON store"}
+            {saving ? "Saving…" : lastSaved ? `Saved ${lastSaved}` : "Local encrypted store"}
           </div>
           {error ? <div style={{ color: "var(--red)", marginTop: 6 }}>{error}</div> : null}
         </div>
@@ -72,9 +80,13 @@ export default function App() {
           <Route path="/intake" element={<Intake />} />
           <Route path="/tailoring" element={<Tailoring />} />
           <Route path="/ssp" element={<Ssp />} />
+          <Route path="/boundary" element={<BoundaryPage />} />
           <Route path="/policies" element={<Policies />} />
           <Route path="/evidence" element={<Evidence />} />
           <Route path="/poam" element={<Poam />} />
+          <Route path="/assets" element={<Assets />} />
+          <Route path="/stig" element={<StigMatrix />} />
+          <Route path="/ingest" element={<Ingest />} />
           <Route path="/export" element={<ExportPage />} />
         </Routes>
         <p className="footer-note">

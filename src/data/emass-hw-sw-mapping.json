@@ -1,0 +1,38 @@
+{
+  "format": "joint-emass-oriented",
+  "disclaimer": "Column names are Joint eMASS-oriented working-paper headers used by this workbench. They are not official DISA or eMASS templates.",
+  "hardware": {
+    "artifactType": "hardware-baseline",
+    "handling": "parse",
+    "matchPreference": ["hostName", "assetName"],
+    "jumpHost": {
+      "incomingAssetType": "Jump Host",
+      "mappedAssetType": "Server",
+      "notesValue": "Jump host"
+    },
+    "columns": [
+      { "header": "Asset Name", "field": "assetName", "aliases": ["AssetName", "Name"] },
+      { "header": "Asset Type", "field": "assetType", "aliases": ["AssetType", "Type"] },
+      { "header": "Manufacturer", "field": "manufacturer", "aliases": [] },
+      { "header": "Model", "field": "model", "aliases": [] },
+      { "header": "Serial Number", "field": "serialNumber", "aliases": ["SerialNumber", "Serial"] },
+      { "header": "Host Name", "field": "hostName", "aliases": ["HostName", "Hostname"] },
+      { "header": "IP Address", "field": "ipAddress", "aliases": ["IPAddress", "IP"] },
+      { "header": "MAC Address", "field": "macAddress", "aliases": ["MACAddress", "MAC"] },
+      { "header": "OS/Firmware", "field": "osFirmware", "aliases": ["OS", "OS/Firmware Version", "Operating System"] },
+      { "header": "Location", "field": "location", "aliases": [] }
+    ]
+  },
+  "software": {
+    "artifactType": "software-baseline",
+    "handling": "parse",
+    "matchPreference": ["name", "version", "relatedAsset"],
+    "columns": [
+      { "header": "Software Name", "field": "name", "aliases": ["Name", "Software"] },
+      { "header": "Vendor", "field": "vendor", "aliases": ["Publisher"] },
+      { "header": "Version", "field": "version", "aliases": ["Software Version"] },
+      { "header": "License", "field": "license", "aliases": ["License Number"] },
+      { "header": "Related Asset/Host", "field": "relatedAsset", "aliases": ["Related Asset", "Related Host"] }
+    ]
+  }
+}

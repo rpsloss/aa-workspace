@@ -9,6 +9,7 @@ export default function Dashboard() {
   const controls = controlList(pkg);
   const scoped = controls.filter((c) => c.selection === "in-scope");
   const inherited = controls.filter((c) => c.selection === "inherited");
+  const hybrid = controls.filter((c) => c.selection === "hybrid");
   const openPoam = pkg.poams.filter((p) => p.status === "open" || p.status === "ongoing");
   const signedPolicies = pkg.policies.filter((p) => p.status === "signed" || p.status === "ready-for-review").length;
   const block = blockers.filter((b) => b.severity === "blocker");
@@ -41,7 +42,7 @@ export default function Dashboard() {
           <div className="label">Tailored controls</div>
           <div className="value">{controls.length}</div>
           <div className="muted">
-            {scoped.length} in-scope · {inherited.length} inherited
+            {scoped.length} in-scope · {inherited.length} inherited · {hybrid.length} hybrid
           </div>
         </div>
         <div className="card kpi">

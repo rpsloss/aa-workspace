@@ -1,0 +1,15 @@
+{
+  "format": "workspace-ppsm-csv",
+  "disclaimer": "Column names are obvious working-paper headers used by this workbench. They are NOT an official DISA or PPSM template.",
+  "artifactType": "ppsm",
+  "handling": "parse",
+  "target": "dataFlows",
+  "matchPreference": ["source", "destination", "protocol", "port", "name"],
+  "columns": [
+    { "header": "Source", "field": "source", "aliases": [] },
+    { "header": "Destination", "field": "destination", "aliases": [] },
+    { "header": "Protocol", "field": "protocol", "aliases": [] },
+    { "header": "Port", "field": "port", "aliases": [] },
+    { "header": "Description", "field": "description", "aliases": [] }
+  ]
+}

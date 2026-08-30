@@ -1,4 +1,5 @@
 import { CATALOG } from "../data/catalog";
+import { missingInheritanceSourceControls } from "./inheritance.mjs";
 import type { AaPackage } from "../types";
 
 export type BlockerSeverity = "blocker" | "warning" | "info";
@@ -98,13 +99,13 @@ export function computeBlockers(pkg: AaPackage): Blocker[] {
     });
   }
 
-  const inheritedMissing = controlList(pkg).filter((c) => c.selection === "inherited" && !c.inheritedFrom.trim());
+  const inheritedMissing = missingInheritanceSourceControls(pkg);
   if (inheritedMissing.length > 0) {
     blockers.push({
       id: "inherit",
       severity: "blocker",
-      title: `${inheritedMissing.length} inherited control(s) missing provider system`,
-      detail: "Record the providing GSS/ICAM eMASS ID. Inheritance without a provider is treated as unimplemented.",
+      title: `${inheritedMissing.length} inherited/hybrid control(s) missing inheritance source`,
+      detail: "Inherited or hybrid controls must reference an inheritanceSources[] id (providing GSS/ICAM/component package). Without a source they cannot be treated as complete.",
       href: "/tailoring",
     });
   }

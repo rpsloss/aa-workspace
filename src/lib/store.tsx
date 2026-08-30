@@ -25,9 +25,19 @@ type Store = {
 
 const Ctx = createContext<Store | null>(null);
 
+export function reportPackageAccess(action: "export" | "reload-sample", bytes = 0) {
+  if (action !== "export" && action !== "reload-sample") return;
+  const n = typeof bytes === "number" && Number.isFinite(bytes) && bytes >= 0 ? Math.floor(bytes) : 0;
+  void fetch("/api/access-audit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, outcome: "ok", bytesIn: 0, bytesOut: n }),
+  }).catch(() => {});
+}
+
 async function fetchPackage(): Promise<AaPackage | null> {
   const res = await fetch("/api/package");
-  if (!res.ok) throw new Error("Could not reach the local API. Start npm run dev.");
+  if (!res.ok) throw new Error("Could not load package (HTTP " + res.status + ").");
   const data = await res.json();
   return data.package ?? null;
 }
@@ -81,7 +91,10 @@ export function PackageProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ package: { ...pkg, updatedAt: new Date().toISOString() } }),
       })
         .then((r) => {
-          if (!r.ok) throw new Error("Save failed");
+          if (!r.ok) {
+            if (r.status === 400) throw new Error("Save rejected: inherited/hybrid controls need an inheritance source");
+            throw new Error("Save failed");
+          }
           setLastSaved(new Date().toLocaleTimeString());
           setError(null);
         })
@@ -97,7 +110,9 @@ export function PackageProvider({ children }: { children: ReactNode }) {
 
   const loadSample = useCallback(() => {
     skip.current = false;
-    setPkg(buildSamplePackage());
+    const sample = buildSamplePackage();
+    reportPackageAccess("reload-sample", new TextEncoder().encode(JSON.stringify(sample)).length);
+    setPkg(sample);
   }, []);
 
   const retargetFromIntake = useCallback(() => {

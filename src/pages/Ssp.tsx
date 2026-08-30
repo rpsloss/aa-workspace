@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { CATALOG_BY_ID } from "../data/catalog";
 import { controlList } from "../lib/blockers";
+import { sspBoundaryMarkdown, renderDiagramSection, TBD } from "../lib/sspMarkdown.mjs";
 import { usePackage } from "../lib/store";
+import type { BoundaryEntry, DataFlow } from "../types";
 
 export default function Ssp() {
   const { pkg, setPackage } = usePackage();
@@ -15,6 +18,8 @@ export default function Ssp() {
     });
   }, [pkg, q]);
   const rec = sel ? pkg.controls[sel] : null;
+  const tables = sspBoundaryMarkdown(pkg);
+  const diagram = renderDiagramSection(pkg);
 
   return (
     <div>
@@ -69,6 +74,25 @@ export default function Ssp() {
           onChange={(e) => setPackage((p) => ({ ...p, ssp: { ...p.ssp, inheritanceNotes: e.target.value } }))}
         />
       </div>
+
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h2>Boundary tables (from package data)</h2>
+        <p>
+          These sections read inbound / outbound / interconnect and dataFlows. Empty tables are TBD — they do not
+          invent flows. Edit on the <Link to="/boundary">Boundary</Link> page.
+        </p>
+        <h3>Inbound</h3>
+        <TableOrTbd rows={pkg.boundary.inbound} markdown={tables.inbound} />
+        <h3>Outbound</h3>
+        <TableOrTbd rows={pkg.boundary.outbound} markdown={tables.outbound} />
+        <h3>Interconnections</h3>
+        <TableOrTbd rows={pkg.boundary.interconnect} markdown={tables.interconnect} />
+        <h3>Data flows</h3>
+        <FlowTableOrTbd rows={pkg.dataFlows} markdown={tables.dataFlows} />
+        <h3>Boundary diagram</h3>
+        <p className="muted">{diagram}</p>
+      </div>
+
       <h2>Control implementations</h2>
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter controls" />
       <div className="split">
@@ -143,5 +167,65 @@ export default function Ssp() {
         </div>
       </div>
     </div>
+  );
+}
+
+function TableOrTbd({ rows, markdown }: { rows: BoundaryEntry[]; markdown: string }) {
+  if (rows.length === 0 || markdown === TBD) {
+    return <p className="tbd">{TBD}</p>;
+  }
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Ownership</th>
+          <th>Description</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.id}>
+            <td>{row.name}</td>
+            <td>{row.ownership}</td>
+            <td>{row.description}</td>
+            <td>{row.notes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function FlowTableOrTbd({ rows, markdown }: { rows: DataFlow[]; markdown: string }) {
+  if (rows.length === 0 || markdown === TBD) {
+    return <p className="tbd">{TBD}</p>;
+  }
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Source</th>
+          <th>Destination</th>
+          <th>Protocol</th>
+          <th>Port</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.id}>
+            <td>{row.name}</td>
+            <td>{row.source}</td>
+            <td>{row.destination}</td>
+            <td>{row.protocol ?? ""}</td>
+            <td>{row.port ?? ""}</td>
+            <td>{row.description}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

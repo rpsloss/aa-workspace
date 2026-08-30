@@ -1,4 +1,24 @@
 import { CATALOG } from "./catalog";
+import { isControlSelected, retargetControls as retargetFromCatalog } from "../lib/tailor.mjs";
+import {
+  SCHEMA_VERSION,
+  ensureInventory,
+  seedSldssAssets,
+  seedSldssSoftware,
+} from "../lib/inventory.mjs";
+import {
+  ensureBoundary,
+  seedSldssBoundary,
+  seedSldssDataFlows,
+} from "../lib/boundary.mjs";
+import {
+  ensureInheritance,
+  sampleInheritanceSourceId,
+  seedSldssInheritanceSources,
+} from "../lib/inheritance.mjs";
+import { ensureArtifacts } from "../lib/ingest/artifacts.mjs";
+import { ensureStigAssignments, seedSldssStigAssignments } from "../lib/stig.mjs";
+import { ensureScanFindings } from "../lib/ingest/scan.mjs";
 import type {
   AaPackage,
   ControlRecord,
@@ -10,6 +30,8 @@ import type {
   PoamItem,
   SelectionStatus,
 } from "../types";
+
+export { isControlSelected };
 
 function person(name: string, org: string, email: string): Person {
   return { name, org, email, phone: "DSN 555-0100" };
@@ -125,15 +147,6 @@ export function defaultIntake(): Intake {
   };
 }
 
-export function isControlSelected(intake: Intake, overlays: string[]): boolean {
-  const selected: string[] = [];
-  if (intake.overlayNistModerate) selected.push("nist-moderate");
-  if (intake.overlayCnssi1253) selected.push("cnssi-1253");
-  if (intake.overlayDodRmf) selected.push("dod-rmf");
-  if (intake.overlayPrivacy) selected.push("privacy");
-  return overlays.some((o) => selected.includes(o));
-}
-
 export function buildSamplePackage(): AaPackage {
   const intake: Intake = {
     systemName: "Sentinel Logistics Decision Support System",
@@ -206,6 +219,7 @@ export function buildSamplePackage(): AaPackage {
     let selection: SelectionStatus = "in-scope";
     let implementation: ImplementationStatus = "implemented";
     let inheritedFrom = "";
+    let inheritanceSourceId = "";
     let naJustification = "";
 
     if (item.family === "PE" && item.id !== "PE-1") {
@@ -237,11 +251,14 @@ export function buildSamplePackage(): AaPackage {
       implementation = "partial";
     }
 
+    inheritanceSourceId = sampleInheritanceSourceId(item, selection);
+
     controls[item.id] = {
       controlId: item.id,
       selection,
       implementation,
       inheritedFrom,
+      inheritanceSourceId,
       naJustification,
       implementationStatement: statement(item.id, selection, inheritedFrom),
       responsibleRole: selection === "inherited" ? "Provider ISSO / SLDSS ISSO (validate)" : "ISSO",
@@ -437,7 +454,7 @@ export function buildSamplePackage(): AaPackage {
   ];
 
   return {
-    schemaVersion: 1,
+    schemaVersion: SCHEMA_VERSION,
     framework: "DoD RMF",
     catalog: "NIST SP 800-53 Revision 5",
     systemOfRecord: "eMASS",
@@ -449,6 +466,15 @@ export function buildSamplePackage(): AaPackage {
     policies,
     evidence,
     poams,
+    assets: seedSldssAssets(),
+    software: seedSldssSoftware(),
+    boundary: seedSldssBoundary(),
+    dataFlows: seedSldssDataFlows(),
+    boundaryDiagramEvidenceId: "ev-001",
+    inheritanceSources: seedSldssInheritanceSources(),
+    artifacts: [],
+    stigAssignments: seedSldssStigAssignments(),
+    scanFindings: [],
     ssp: {
       purpose:
         "This System Security Plan describes security and privacy controls selected and implemented for SLDSS under DoD RMF (DoDI 8510.01) using NIST SP 800-53 Revision 5, the NIST moderate baseline (800-53B), and CNSSI 1253 overlays. CMMC is not used. eMASS is the system of record for the authorization; this workbench holds working papers.",
@@ -480,67 +506,44 @@ export function hydratePackage(raw: Partial<AaPackage> | null | undefined): AaPa
     externalServices: "",
     inheritanceNotes: "",
   };
-  return {
-    schemaVersion: 1,
-    framework: raw?.framework ?? "DoD RMF",
-    catalog: raw?.catalog ?? "NIST SP 800-53 Revision 5",
-    systemOfRecord: "eMASS",
-    cmmcInScope: false,
-    sample: raw?.sample ?? false,
-    updatedAt: raw?.updatedAt ?? new Date().toISOString(),
-    intake: {
-      ...defaults,
-      ...intake,
-      roles: { ...defaults.roles, ...(intake.roles ?? {}) },
-    },
-    controls: raw?.controls ?? {},
-    policies: raw?.policies ?? [],
-    evidence: raw?.evidence ?? [],
-    poams: raw?.poams ?? [],
-    ssp: { ...emptySsp, ...(raw?.ssp ?? {}) },
-  };
+  return ensureScanFindings(ensureStigAssignments(
+    ensureArtifacts(
+    ensureInheritance(
+    ensureBoundary(
+      ensureInventory({
+        schemaVersion: SCHEMA_VERSION,
+        framework: raw?.framework ?? "DoD RMF",
+        catalog: raw?.catalog ?? "NIST SP 800-53 Revision 5",
+        systemOfRecord: "eMASS",
+        cmmcInScope: false,
+        sample: raw?.sample ?? false,
+        updatedAt: raw?.updatedAt ?? new Date().toISOString(),
+        intake: {
+          ...defaults,
+          ...intake,
+          roles: { ...defaults.roles, ...(intake.roles ?? {}) },
+        },
+        controls: raw?.controls ?? {},
+        policies: raw?.policies ?? [],
+        evidence: raw?.evidence ?? [],
+        poams: raw?.poams ?? [],
+        ssp: { ...emptySsp, ...(raw?.ssp ?? {}) },
+        assets: raw?.assets,
+        software: raw?.software,
+        boundary: raw?.boundary,
+        dataFlows: raw?.dataFlows,
+        boundaryDiagramEvidenceId: raw?.boundaryDiagramEvidenceId,
+        inheritanceSources: raw?.inheritanceSources,
+        artifacts: raw?.artifacts,
+        stigAssignments: raw?.stigAssignments,
+        scanFindings: raw?.scanFindings,
+      }),
+    ),
+    ),
+    ),
+  ));
 }
 
 export function retargetControls(pkg: AaPackage): AaPackage {
-  const next = { ...pkg, controls: { ...pkg.controls } };
-  for (const item of CATALOG) {
-    const selected = isControlSelected(pkg.intake, item.overlays);
-    if (!selected) {
-      delete next.controls[item.id];
-      continue;
-    }
-    if (!next.controls[item.id]) {
-      next.controls[item.id] = {
-        controlId: item.id,
-        selection: "in-scope",
-        implementation: "not-implemented",
-        inheritedFrom: "",
-        naJustification: "",
-        implementationStatement: "",
-        responsibleRole: "ISSO",
-        parameters: "",
-        assessment: "not-started",
-        notes: "",
-      };
-    }
-  }
-  const policyIds = new Set(
-    CATALOG.filter((i) => i.policyControl && isControlSelected(pkg.intake, i.overlays)).map((i) => i.id),
-  );
-  const existing = new Map(pkg.policies.map((p) => [p.controlId, p]));
-  next.policies = [...policyIds].map((id) => {
-    const found = existing.get(id);
-    if (found) return found;
-    const item = CATALOG.find((c) => c.id === id)!;
-    return {
-      id: `pol-${id}`,
-      controlId: id,
-      title: `${id} ${item.title}`,
-      status: "stub" as const,
-      owner: "ISSO",
-      body: `# ${id} ${item.title}\n\nStub generated by A&A Workbench. Expand before SCA freeze.\n`,
-      lastUpdated: new Date().toISOString().slice(0, 10),
-    };
-  });
-  return next;
+  return retargetFromCatalog(pkg, CATALOG);
 }

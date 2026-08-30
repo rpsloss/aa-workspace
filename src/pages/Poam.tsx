@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePackage } from "../lib/store";
-import type { PoamItem, PoamRisk, PoamStatus } from "../types";
+import type { AaPackage, PoamItem, PoamRisk, PoamStatus } from "../types";
 
 const risks: PoamRisk[] = ["Very High", "High", "Moderate", "Low", "Very Low"];
 
@@ -24,10 +24,65 @@ function blank(): PoamItem {
   };
 }
 
+type SeedPreview = {
+  ok: boolean;
+  counts?: { add: number; update: number; unchanged: number; conflict: number };
+  items?: Array<{ status: string; reason: string; index: number; incoming: Record<string, string> }>;
+};
+
 export default function Poam() {
   const { pkg, setPackage } = usePackage();
   const [sel, setSel] = useState<string | null>(pkg.poams[0]?.id ?? null);
   const item = pkg.poams.find((p) => p.id === sel);
+  const [seedBusy, setSeedBusy] = useState(false);
+  const [seedPreview, setSeedPreview] = useState<SeedPreview | null>(null);
+  const [seedMessage, setSeedMessage] = useState<string | null>(null);
+
+  async function previewPoamSeed() {
+    setSeedBusy(true);
+    setSeedMessage(null);
+    try {
+      const res = await fetch("/api/ingest/poam-seed/preview", { method: "POST" });
+      const data = (await res.json()) as SeedPreview;
+      if (!res.ok) {
+        setSeedPreview(null);
+        setSeedMessage("POA&M seed preview failed.");
+        return;
+      }
+      setSeedPreview(data);
+    } catch {
+      setSeedMessage("POA&M seed preview failed.");
+    } finally {
+      setSeedBusy(false);
+    }
+  }
+
+  async function applyPoamSeed() {
+    if (!seedPreview) return;
+    setSeedBusy(true);
+    setSeedMessage(null);
+    try {
+      const res = await fetch("/api/ingest/poam-seed/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSeedMessage("POA&M seed apply failed.");
+        return;
+      }
+      if (data.package) setPackage(() => data.package as AaPackage);
+      const a = data.applied || {};
+      setSeedMessage(`Seeded: ${a.added || 0} added, ${a.updated || 0} updated, ${a.unchanged || 0} unchanged, ${a.skipped || 0} skipped.`);
+      setSeedPreview(null);
+    } catch {
+      setSeedMessage("POA&M seed apply failed.");
+    } finally {
+      setSeedBusy(false);
+    }
+  }
+
 
   function patch(id: string, partial: Partial<PoamItem>) {
     setPackage((p) => ({
@@ -42,7 +97,8 @@ export default function Poam() {
       <h1>POA&amp;M</h1>
       <p>
         Working POA&amp;M register aligned to typical eMASS fields. Assign eMASS POA&amp;M IDs after create-in-eMASS.
-        Mark ATO blockers for the dashboard.
+        Mark ATO blockers for the dashboard. Open scan findings can seed rows with a separate preview/apply (Control
+        blank; findings have no NIST IDs). Scan PARSE does not auto-seed. This does not auto-Satisfied.
       </p>
       <div className="row">
         <button
@@ -56,7 +112,21 @@ export default function Poam() {
         >
           Add POA&amp;M
         </button>
+        <button type="button" disabled={seedBusy} onClick={() => void previewPoamSeed()}>
+          Preview seed from open findings
+        </button>
+        <button type="button" disabled={!seedPreview || seedBusy} onClick={() => void applyPoamSeed()}>
+          Apply seed
+        </button>
       </div>
+      {seedPreview?.counts ? (
+        <p>
+          Seed preview · add {seedPreview.counts.add} · update {seedPreview.counts.update} · unchanged{" "}
+          {seedPreview.counts.unchanged} · conflict {seedPreview.counts.conflict}. Control stays blank; unknown Control
+          is skipped.
+        </p>
+      ) : null}
+      {seedMessage ? <p>{seedMessage}</p> : null}
       <div className="split">
         <div className="card" style={{ overflow: "auto" }}>
           <table>
@@ -119,6 +189,7 @@ export default function Poam() {
                 <div>
                   <label>Risk</label>
                   <select value={item.risk} onChange={(e) => patch(item.id, { risk: e.target.value as PoamRisk })}>
+                    <option value="">TBD</option>
                     {risks.map((r) => (
                       <option key={r}>{r}</option>
                     ))}
@@ -130,6 +201,7 @@ export default function Poam() {
                     value={item.residualRisk}
                     onChange={(e) => patch(item.id, { residualRisk: e.target.value as PoamRisk })}
                   >
+                    <option value="">TBD</option>
                     {risks.map((r) => (
                       <option key={r}>{r}</option>
                     ))}
