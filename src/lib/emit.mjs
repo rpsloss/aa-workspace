@@ -131,6 +131,15 @@ export function completenessChecklist(pkg, options = {}) {
       ? { status: "present", notes: poams.length === 0 ? "no POA&Ms" : "eMASS POA&M IDs pasted" }
       : { status: "TBD", notes: `${tbdPoam.length} of ${poams.length} emassPoamId TBD-eMASS` };
 
+  const blankControl = poams.filter((row) => !str(row?.controlId).trim());
+  const poamControl =
+    blankControl.length === 0
+      ? { status: "present", notes: poams.length === 0 ? "no POA&Ms" : "POA&M Control filled" }
+      : {
+          status: "TBD",
+          notes: `${blankControl.length} of ${poams.length} missing control, not ready for eMASS paste`,
+        };
+
   const map = originalsMap(options.originals);
   const artifacts = asList(b.artifacts);
   const missingOriginals = artifacts.filter((row) => {
@@ -178,6 +187,10 @@ ${line("inherited/hybrid without source", inheritance)}
 ## emassPoamId
 
 ${line("emassPoamId", poamId)}
+
+## Control
+
+${line("Control", poamControl)}
 
 ## Tagged originals
 
