@@ -21,6 +21,7 @@ import {
   emitZipFilename,
   jointCsv,
 } from "../src/lib/emit.mjs";
+import { draftPoamFromOpenFinding } from "../src/lib/scanPoamSeed.mjs";
 import { unzipFile, unzipNames } from "../src/lib/zipMemory.mjs";
 
 const temps = [];
@@ -211,6 +212,31 @@ describe("F8 completeness checklist", () => {
     assert.equal(index.split("\n")[0], ARTIFACT_INDEX_COLUMNS.join(","));
     assert.match(index, /diagram,boundary\.png,,store-only,/);
     assert.equal(index.includes("keep weakness"), false);
+  });
+
+  it("flags a seed row with blank Control as TBD missing control; a row with Control is not flagged", () => {
+    const draft = draftPoamFromOpenFinding({
+      status: "open",
+      title: "Fixture open rule",
+      pluginId: "SV-FIX-0001",
+      sourceType: "cklb",
+    });
+    assert.equal(draft.controlId, "");
+    const blankMd = completenessChecklist({ ...fixturePkg(), poams: [draft] });
+    assert.match(blankMd, /Control: TBD \(1 of 1 missing control, not ready for eMASS paste\)/);
+    assert.match(blankMd, /not ready for eMASS paste/);
+    assert.equal(blankMd.includes("Weakness Identifier"), false);
+
+    const filledMd = completenessChecklist(fixturePkg());
+    assert.match(filledMd, /Control: present \(POA&M Control filled\)/);
+    assert.equal(filledMd.includes("missing control"), false);
+    assert.equal(filledMd.includes("not ready for eMASS paste"), false);
+
+    const mixedMd = completenessChecklist({
+      ...fixturePkg(),
+      poams: [draft, fixturePkg().poams[0]],
+    });
+    assert.match(mixedMd, /Control: TBD \(1 of 2 missing control, not ready for eMASS paste\)/);
   });
 });
 
