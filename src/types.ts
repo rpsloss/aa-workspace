@@ -276,7 +276,41 @@ export type JointArtifactType =
   | "letter"
   | "diagram"
   | "nessus"
-  | "cklb";
+  | "cklb"
+  | "tdd"
+  | "conops";
+
+/** Editable TDD/CONOPS extract for Categorize/Select starter pack (workspace-only). */
+export type DesignComponent = {
+  id: string;
+  name: string;
+  os: string;
+  apps: string;
+  notes: string;
+};
+
+export type DesignInterface = {
+  id: string;
+  name: string;
+  port: string;
+  protocol: string;
+  direction: "inbound" | "outbound" | "bidirectional" | "internal";
+  source: string;
+  destination: string;
+  notes: string;
+};
+
+export type DesignExtract = {
+  dataTypes: string;
+  components: DesignComponent[];
+  interfaces: DesignInterface[];
+  confidentiality: ImpactLevel;
+  integrity: ImpactLevel;
+  availability: ImpactLevel;
+  notes: string;
+  /** ISO timestamp when generate last ran. Empty until generate. */
+  generatedAt: string;
+};
 
 export type ArtifactMode = "parse" | "generate" | "store-only";
 
@@ -319,6 +353,8 @@ export type AaPackage = {
   stigAssignments: StigAssignment[];
   /** Findings from PARSE of .nessus/.cklb. Missing → []. Never auto-maps to NIST Satisfied. */
   scanFindings: ScanFinding[];
+  /** Editable TDD/CONOPS extract for starter pack. Missing → empty via ensureDesignExtract. */
+  designExtract: DesignExtract;
 };
 
 export const ROLE_LABELS: Record<RoleKey, string> = {

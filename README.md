@@ -16,6 +16,7 @@ v1 covers:
 - Authorization boundary inbound/outbound/interconnect tables, data flows (empty tables export as TBD), and a boundary-diagram evidence file slot
 - Inheritance sources (package IDs) and hybrid selection; inherited/hybrid controls require a source
 - STIG product-family matrix (rhel-8, windows-server, postgresql) on hosts and software rows; official DISA STIG IDs stay blank/TBD; scan findings list with advisory CCI ids copied from the file when present (no auto-Satisfied, no CCI catalog); optional POA&M seed from open findings with blank Control
+- TDD/CONOPS design-docs page with tagged store-only artifacts, editable extract, and Categorize/Select starter-pack generation (HW/SW, PPSM/data-flow prep, STIG family draft, control set via existing catalog); dashboard checklist %; starter-pack MD/CSV in the working-papers zip
 
 ## Run locally
 

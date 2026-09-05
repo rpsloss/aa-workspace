@@ -12,9 +12,11 @@ import StigMatrix from "./pages/Stig";
 import BoundaryPage from "./pages/Boundary";
 import ExportPage from "./pages/Export";
 import Ingest from "./pages/Ingest";
+import DesignDocs from "./pages/DesignDocs";
 
 const links = [
   ["/dashboard", "ATO blockers"],
+  ["/design", "Design docs"],
   ["/intake", "Intake"],
   ["/tailoring", "800-53 tailoring"],
   ["/ssp", "SSP"],
@@ -77,6 +79,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/design" element={<DesignDocs />} />
           <Route path="/intake" element={<Intake />} />
           <Route path="/tailoring" element={<Tailoring />} />
           <Route path="/ssp" element={<Ssp />} />
