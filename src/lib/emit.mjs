@@ -7,6 +7,7 @@ import { loadJointMap } from "./ingest/parse.mjs";
 import { sspMarkdown } from "./sspMarkdown.mjs";
 import { poamCsv } from "./poamCsv.mjs";
 import { buildZip } from "./zipMemory.mjs";
+import { starterPackCsv, starterPackMarkdown } from "./starterPack.mjs";
 
 export const ZIP_FALLBACK_ACRONYM = "sldss";
 export const ZIP_SUFFIX = "-emass-working-papers.zip";
@@ -218,6 +219,8 @@ export function buildEmitFiles(pkg, options = {}) {
     { name: `${ac}-software.csv`, data: Buffer.from(jointCsv("software", b.software), "utf8") },
     { name: "artifact-index.csv", data: Buffer.from(artifactIndexCsv(b.artifacts), "utf8") },
     { name: "completeness-checklist.md", data: Buffer.from(completenessChecklist(b, { originals: map }), "utf8") },
+    { name: `${ac}-starter-pack.md`, data: Buffer.from(starterPackMarkdown(b), "utf8") },
+    { name: `${ac}-starter-pack.csv`, data: Buffer.from(starterPackCsv(b), "utf8") },
   ];
 
   const used = new Set();

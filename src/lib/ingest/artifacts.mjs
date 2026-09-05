@@ -3,7 +3,7 @@
 import { asList } from "../inventory.mjs";
 
 export const PARSE_TYPES = Object.freeze(["hardware-baseline", "software-baseline", "poam", "ppsm"]);
-export const STORE_ONLY_TYPES = Object.freeze(["ssp", "policy", "letter", "diagram", "nessus", "cklb"]);
+export const STORE_ONLY_TYPES = Object.freeze(["ssp", "policy", "letter", "diagram", "nessus", "cklb", "tdd", "conops"]);
 export const JOINT_ARTIFACT_TYPES = Object.freeze([...PARSE_TYPES, ...STORE_ONLY_TYPES]);
 export const NOT_THIS_PASS = Object.freeze(["ssp-narrative"]);
 

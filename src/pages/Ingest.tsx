@@ -24,7 +24,7 @@ type PreviewResponse = {
   errorClass?: string;
 };
 
-const STORE_TYPES: JointArtifactType[] = ["poam", "ssp", "policy", "letter", "diagram", "nessus", "cklb"];
+const STORE_TYPES: JointArtifactType[] = ["poam", "ssp", "policy", "letter", "diagram", "nessus", "cklb", "tdd", "conops"];
 const PARSE_TYPES: ParseArtifactType[] = ["hardware-baseline", "software-baseline", "poam", "ppsm", "nessus", "cklb"];
 
 function labelOf(row: Record<string, string>, kind: string | null) {

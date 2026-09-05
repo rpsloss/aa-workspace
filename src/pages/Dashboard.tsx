@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { computeBlockers, controlList, impactKey, readiness } from "../lib/blockers";
+import { starterPackChecklist } from "../lib/starterPack.mjs";
 import { usePackage } from "../lib/store";
 
 export default function Dashboard() {
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const block = blockers.filter((b) => b.severity === "blocker");
   const warn = blockers.filter((b) => b.severity === "warning");
   const info = blockers.filter((b) => b.severity === "info");
+  const starter = starterPackChecklist(pkg);
 
   return (
     <div>
@@ -57,6 +59,29 @@ export default function Dashboard() {
           </div>
           <div className="muted">{pkg.evidence.length} evidence records</div>
         </div>
+        <div className="card kpi">
+          <div className="label">Starter pack</div>
+          <div className="value">{starter.percent}%</div>
+          <div className="muted">
+            {starter.done}/{starter.total} Categorize/Select artifacts ·{" "}
+            <Link to="/design">Design docs</Link>
+          </div>
+        </div>
+      </div>
+
+      <h2>Starter pack checklist</h2>
+      <p>
+        TDD/CONOPS → Categorize/Select working papers. Heuristic only — keeps the existing AO-readiness score separate
+        and makes no authorization claims.
+      </p>
+      <div className="list" style={{ marginBottom: 24 }}>
+        {starter.items.map((item) => (
+          <Link key={item.id} className="blocker-item" to={item.href}>
+            <span className={`pill ${item.done ? "ok" : "warning"}`}>{item.done ? "present" : "TBD"}</span>
+            <h3>{item.label}</h3>
+            <div className="muted">{item.detail}</div>
+          </Link>
+        ))}
       </div>
 
       <h2>Blockers</h2>

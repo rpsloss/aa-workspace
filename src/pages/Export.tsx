@@ -3,6 +3,7 @@ import { controlList } from "../lib/blockers";
 import { hardwareCsv, softwareCsv } from "../lib/inventory.mjs";
 import { poamCsv } from "../lib/poamCsv.mjs";
 import { sspMarkdown } from "../lib/sspMarkdown.mjs";
+import { starterPackCsv, starterPackMarkdown } from "../lib/starterPack.mjs";
 import { reportPackageAccess, usePackage } from "../lib/store";
 
 function download(filename: string, text: string, type = "text/plain") {
@@ -88,8 +89,8 @@ export default function ExportPage() {
         <div className="card">
           <h2>Working-papers zip</h2>
           <p>
-            One zip: SSP markdown, POA&amp;M CSV, hardware/software CSV, artifact index, completeness checklist, and
-            tagged originals. Not a live eMASS connection. No sync.
+            One zip: SSP markdown, POA&amp;M CSV, hardware/software CSV, artifact index, completeness checklist,
+            Categorize/Select starter-pack MD/CSV, and tagged originals. Not a live eMASS connection. No sync.
           </p>
           <button type="button" className="primary" onClick={() => void downloadEmitZip(ac)}>
             Download eMASS working-papers zip
@@ -130,6 +131,29 @@ export default function ExportPage() {
           >
             Download JSON
           </button>
+        </div>
+        <div className="card">
+          <h2>Starter pack (MD / CSV)</h2>
+          <p>
+            eMASS-oriented Categorize/Select checklist from TDD/CONOPS extract. Not an official DISA template. Official
+            STIG IDs stay blank/TBD.
+          </p>
+          <div className="row">
+            <button
+              type="button"
+              className="primary"
+              onClick={() => download(`${ac}-starter-pack.md`, starterPackMarkdown(pkg))}
+            >
+              Download starter-pack MD
+            </button>
+            <button
+              type="button"
+              className="primary"
+              onClick={() => download(`${ac}-starter-pack.csv`, starterPackCsv(pkg), "text/csv")}
+            >
+              Download starter-pack CSV
+            </button>
+          </div>
         </div>
         <div className="card">
           <h2>Hardware (CSV)</h2>

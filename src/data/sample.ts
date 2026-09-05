@@ -19,6 +19,7 @@ import {
 import { ensureArtifacts } from "../lib/ingest/artifacts.mjs";
 import { ensureStigAssignments, seedSldssStigAssignments } from "../lib/stig.mjs";
 import { ensureScanFindings } from "../lib/ingest/scan.mjs";
+import { emptyDesignExtract, ensureDesignExtract } from "../lib/starterPack.mjs";
 import type {
   AaPackage,
   ControlRecord,
@@ -475,6 +476,7 @@ export function buildSamplePackage(): AaPackage {
     artifacts: [],
     stigAssignments: seedSldssStigAssignments(),
     scanFindings: [],
+    designExtract: emptyDesignExtract(),
     ssp: {
       purpose:
         "This System Security Plan describes security and privacy controls selected and implemented for SLDSS under DoD RMF (DoDI 8510.01) using NIST SP 800-53 Revision 5, the NIST moderate baseline (800-53B), and CNSSI 1253 overlays. CMMC is not used. eMASS is the system of record for the authorization; this workbench holds working papers.",
@@ -506,7 +508,7 @@ export function hydratePackage(raw: Partial<AaPackage> | null | undefined): AaPa
     externalServices: "",
     inheritanceNotes: "",
   };
-  return ensureScanFindings(ensureStigAssignments(
+  return ensureDesignExtract(ensureScanFindings(ensureStigAssignments(
     ensureArtifacts(
     ensureInheritance(
     ensureBoundary(
@@ -537,11 +539,12 @@ export function hydratePackage(raw: Partial<AaPackage> | null | undefined): AaPa
         artifacts: raw?.artifacts,
         stigAssignments: raw?.stigAssignments,
         scanFindings: raw?.scanFindings,
+        designExtract: raw?.designExtract,
       }),
     ),
     ),
     ),
-  ));
+  )));
 }
 
 export function retargetControls(pkg: AaPackage): AaPackage {

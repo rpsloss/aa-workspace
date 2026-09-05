@@ -9,7 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "start": "NODE_ENV=production node server/index.mjs",
     "preview": "vite preview",
-    "test": "node --test test/hardening.test.mjs test/f1-inventory.test.mjs test/f2-boundary.test.mjs test/f3-inheritance.test.mjs test/cui-at-rest.test.mjs test/f14-ingest.test.mjs test/f8-emit.test.mjs test/ingest-rest.test.mjs test/f4-stig.test.mjs test/f5-scan.test.mjs test/f6-cci.test.mjs test/f7-poam-seed.test.mjs"
+    "test": "node --test test/hardening.test.mjs test/f1-inventory.test.mjs test/f2-boundary.test.mjs test/f3-inheritance.test.mjs test/cui-at-rest.test.mjs test/f14-ingest.test.mjs test/f8-emit.test.mjs test/ingest-rest.test.mjs test/f4-stig.test.mjs test/f5-scan.test.mjs test/f6-cci.test.mjs test/f7-poam-seed.test.mjs test/starter-pack.test.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
