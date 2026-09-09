@@ -199,14 +199,14 @@ export function buildSamplePackage(): AaPackage {
     pii: true,
     phi: false,
     roles: {
-      authorizingOfficial: person("COL A. Reyes", org, "ao.reyes.sample@army.mil"),
-      aoDesignatedRep: person("LTC J. Okonkwo", org, "aodr.okonkwo.sample@army.mil"),
-      systemOwner: person("Ms. P. Hartmann", org, "iso.hartmann.sample@army.mil"),
-      isso: person("Mr. D. Voss", org, "isso.voss.sample@army.mil"),
-      issm: person("Ms. K. Singh", org, "issm.singh.sample@army.mil"),
-      sca: person("Mr. L. Chen (SCA, independent)", "Assessing org (sample)", "sca.chen.sample@army.mil"),
-      programManager: person("MAJ R. Ellis", org, "pm.ellis.sample@army.mil"),
-      privacyOfficer: person("Ms. N. Alvarez", org, "privacy.alvarez.sample@army.mil"),
+      authorizingOfficial: person("COL A. Reyes", org, "ao.reyes.sample@example.mil"),
+      aoDesignatedRep: person("LTC J. Okonkwo", org, "aodr.okonkwo.sample@example.mil"),
+      systemOwner: person("Ms. P. Hartmann", org, "iso.hartmann.sample@example.mil"),
+      isso: person("Mr. D. Voss", org, "isso.voss.sample@example.mil"),
+      issm: person("Ms. K. Singh", org, "issm.singh.sample@example.mil"),
+      sca: person("Mr. L. Chen (SCA, independent)", "Assessing org (sample)", "sca.chen.sample@example.mil"),
+      programManager: person("MAJ R. Ellis", org, "pm.ellis.sample@example.mil"),
+      privacyOfficer: person("Ms. N. Alvarez", org, "privacy.alvarez.sample@example.mil"),
     },
   };
 

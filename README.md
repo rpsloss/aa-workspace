@@ -1,6 +1,8 @@
 # A&A Workbench
 
-Local **DoD RMF Assessment & Authorization** working-paper app. **eMASS stays the system of record.** CMMC is out of scope.
+**UNCLASSIFIED. Fictional sample. Not a real ATO, not CUI, not connected to eMASS.**
+
+Local **DoD RMF Assessment & Authorization** working-paper app for assembling a package on your own machine. **eMASS stays the system of record.** The seeded system (SLDSS) is a made-up moderate-impact example. CMMC is out of scope.
 
 v1 covers:
 
