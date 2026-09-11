@@ -1,4 +1,5 @@
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { BrandMark } from "./components/BrandMark";
 import { usePackage } from "./lib/store";
 import Dashboard from "./pages/Dashboard";
 import Intake from "./pages/Intake";
@@ -45,8 +46,14 @@ export default function App() {
     <div className="shell">
       <aside className="nav">
         <div className="brand">
-          <strong>A&amp;A Workbench</strong>
-          <span>DoD RMF working papers</span>
+          <div className="brand-lockup">
+            <BrandMark />
+            <div>
+              <span className="brand-org">Castleridge</span>
+              <strong>A&amp;A Workbench</strong>
+              <span>DoD RMF working papers</span>
+            </div>
+          </div>
         </div>
         {links.map(([to, label]) => (
           <NavLink key={to} to={to} className={({ isActive }) => `item${isActive ? " active" : ""}`}>
@@ -71,7 +78,7 @@ export default function App() {
       <main className="main">
         <div className="banner">
           <div>
-            <strong>eMASS remains the system of record.</strong> This app assembles intake, tailoring, SSP text,
+            <strong>UNCLASSIFIED · SAMPLE. eMASS remains the system of record.</strong> This app assembles intake, tailoring, SSP text,
             policy stubs, evidence maps, and POA&amp;Ms as working papers. Authorization decisions live in eMASS — not
             here. CMMC is excluded.
           </div>
